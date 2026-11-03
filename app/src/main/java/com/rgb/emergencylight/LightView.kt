@@ -19,7 +19,7 @@ class LightView(context: Context) : View(context) {
     )
     private var mode = 0
     private var speed = 55
-    private var running = true
+    private var running = false
     private var frame = 0
     private val handler = Handler(Looper.getMainLooper())
     private val task = object : Runnable {
@@ -34,7 +34,6 @@ class LightView(context: Context) : View(context) {
 
     init {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-        startLight()
     }
 
     fun setMode(value: Int) {
@@ -47,11 +46,9 @@ class LightView(context: Context) : View(context) {
     }
 
     fun startLight() {
-        if (running) {
-            handler.removeCallbacks(task)
-        } else {
-            running = true
-        }
+        if (running) return
+        running = true
+        handler.removeCallbacks(task)
         handler.post(task)
     }
 
@@ -59,6 +56,16 @@ class LightView(context: Context) : View(context) {
         running = false
         handler.removeCallbacks(task)
         invalidate()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        startLight()
+    }
+
+    override fun onDetachedFromWindow() {
+        stopLight()
+        super.onDetachedFromWindow()
     }
 
     override fun onDraw(canvas: Canvas) {
