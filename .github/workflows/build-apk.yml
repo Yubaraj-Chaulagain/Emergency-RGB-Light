@@ -24,7 +24,7 @@ jobs:
           java-version: "17"
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: uses: android-actions/setup-android@v2
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
