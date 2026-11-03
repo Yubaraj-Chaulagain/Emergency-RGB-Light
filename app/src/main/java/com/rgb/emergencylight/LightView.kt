@@ -72,13 +72,22 @@ class LightView(context: Context) : View(context) {
         val baseSize = (w * 0.13f).coerceAtMost(h * 0.30f).coerceAtLeast(24f)
         textPaint.textSize = baseSize
         val maxWidth = w * 0.88f
-        while (textPaint.measureText(text) > maxWidth && textPaint.textSize > 18f) textPaint.textSize *= 0.92f
+        var textWidth = textPaint.measureText(text)
+        // Keep long messages readable instead of shrinking them until they become tiny.
+        // Long text automatically uses a continuous right-to-left marquee.
+        val isLongText = textWidth > maxWidth
+        if (!isLongText) {
+            while (textWidth > maxWidth && textPaint.textSize > 18f) {
+                textPaint.textSize *= 0.92f
+                textWidth = textPaint.measureText(text)
+            }
+        }
         val centerY = h / 2f - (textPaint.ascent() + textPaint.descent()) / 2f
-        val x = when (effect) {
-            1 -> ((frame * (2f + speed / 18f)) % (w + textPaint.measureText(text))) - textPaint.measureText(text) / 2f
-            2 -> w / 2f
-            3 -> w / 2f
-            4 -> w / 2f
+        val marqueeX = w + textWidth / 2f - ((frame * (2f + speed / 18f)) % (w + textWidth))
+        val x = when {
+            isLongText -> marqueeX
+            effect == 1 -> ((frame * (2f + speed / 18f)) % (w + textWidth)) - textWidth / 2f
+            effect == 2 || effect == 3 || effect == 4 -> w / 2f
             else -> w / 2f
         }
         val y = when (effect) {
