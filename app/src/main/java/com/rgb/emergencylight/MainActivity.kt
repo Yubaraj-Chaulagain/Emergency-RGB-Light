@@ -43,21 +43,63 @@ class MainActivity : Activity() {
             LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
         ))
 
-        val modeSpinner = Spinner(this)
-        modeSpinner.adapter = ArrayAdapter(
-            this, android.R.layout.simple_spinner_dropdown_item, modes
-        )
-        root.addView(modeSpinner, LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, dp(52)
-        ))
-        modeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-            override fun onItemSelected(
-                parent: AdapterView<*>?, view: View?, position: Int, id: Long
-            ) {
-                lightView.setMode(position)
-            }
+        val modeScroll = android.widget.HorizontalScrollView(this).apply {
+            isHorizontalScrollBarEnabled = false
         }
+        val modeButtons = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        modes.forEachIndexed { index, name ->
+            val modeButton = Button(this).apply {
+                text = name
+                isAllCaps = false
+                setOnClickListener {
+                    lightView.setMode(index)
+                    for (i in 0 until modeButtons.childCount) {
+                        (modeButtons.getChildAt(i) as Button).isSelected = i == index
+                    }
+                }
+            }
+            modeButtons.addView(modeButton, LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, dp(48)
+            ).apply { setMargins(dp(3), dp(2), dp(3), dp(2)) })
+        }
+        modeScroll.addView(modeButtons)
+        root.addView(modeScroll, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, dp(54)
+        ))
+
+        val sizeLabel = TextView(this).apply {
+            text = "Bulb size"
+            textSize = 16f
+            setTextColor(Color.WHITE)
+        }
+        root.addView(sizeLabel)
+        val sizeBar = SeekBar(this).apply { max = 100; progress = 35 }
+        root.addView(sizeBar)
+        sizeBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                lightView.setBulbSize(progress)
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+        })
+
+        val brightnessLabel = TextView(this).apply {
+            text = "Brightness"
+            textSize = 16f
+            setTextColor(Color.WHITE)
+        }
+        root.addView(brightnessLabel)
+        val brightnessBar = SeekBar(this).apply { max = 100; progress = 100 }
+        root.addView(brightnessBar)
+        brightnessBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                lightView.setBrightness(progress)
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+        })
 
         val speedLabel = TextView(this).apply {
             text = "Light speed"

@@ -19,6 +19,8 @@ class LightView(context: Context) : View(context) {
     )
     private var mode = 0
     private var speed = 55
+    private var bulbScale = 0.75f
+    private var brightness = 100
     private var running = false
     private var frame = 0
     private val handler = Handler(Looper.getMainLooper())
@@ -38,6 +40,16 @@ class LightView(context: Context) : View(context) {
 
     fun setMode(value: Int) {
         mode = value
+        invalidate()
+    }
+
+    fun setBulbSize(value: Int) {
+        bulbScale = 0.45f + value.coerceIn(0, 100) / 100f * 1.0f
+        invalidate()
+    }
+
+    fun setBrightness(value: Int) {
+        brightness = value.coerceIn(10, 100)
         invalidate()
     }
 
@@ -159,16 +171,18 @@ class LightView(context: Context) : View(context) {
     }
 
     private fun drawBulb(canvas: Canvas, x: Float, y: Float, color: Int, radius: Float) {
-        paint.color = color
+        val alphaColor = (color and 0x00FFFFFF) or ((brightness * 255 / 100) shl 24)
+        val r = radius * bulbScale
+        paint.color = alphaColor
         paint.shader = RadialGradient(
-            x, y, radius * 2.4f,
-            intArrayOf(color, color and 0x00FFFFFF, Color.TRANSPARENT),
+            x, y, r * 2.4f,
+            intArrayOf(alphaColor, alphaColor and 0x00FFFFFF, Color.TRANSPARENT),
             floatArrayOf(0f, 0.45f, 1f),
             Shader.TileMode.CLAMP
         )
-        canvas.drawCircle(x, y, radius * 2.4f, paint)
+        canvas.drawCircle(x, y, r * 2.4f, paint)
         paint.shader = null
-        paint.color = color
-        canvas.drawCircle(x, y, radius * 0.55f, paint)
+        paint.color = alphaColor
+        canvas.drawCircle(x, y, r * 0.55f, paint)
     }
 }
