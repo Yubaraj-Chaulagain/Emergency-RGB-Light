@@ -17,7 +17,7 @@ class MainActivity : Activity() {
     private lateinit var lightView: LightView
 
     private val modes = arrayOf(
-        "Tihar Jhilmili", "Emergency", "Rainbow", "Disco", "Running Light"
+        "Tihar Jhilmili", "Emergency", "Rainbow", "Disco", "Running Light", "Twinkle", "Wave", "Soft Glow"
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

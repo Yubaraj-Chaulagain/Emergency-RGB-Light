@@ -79,7 +79,10 @@ class LightView(context: Context) : View(context) {
             1 -> drawEmergency(canvas, w, h)
             2 -> drawRainbow(canvas, w, h)
             3 -> drawDisco(canvas, w, h)
-            else -> drawRunning(canvas, w, h)
+            4 -> drawRunning(canvas, w, h)
+            5 -> drawTwinkle(canvas, w, h)
+            6 -> drawWave(canvas, w, h)
+            else -> drawSoftGlow(canvas, w, h)
         }
     }
 
@@ -123,6 +126,35 @@ class LightView(context: Context) : View(context) {
         for (i in 0 until count) {
             val x = ((i + frame) % count + 0.5f) * w / count
             drawBulb(canvas, x, h / 2f, colors[i % colors.size], 16f)
+        }
+    }
+
+    private fun drawTwinkle(canvas: Canvas, w: Float, h: Float) {
+        val random = Random(frame / 2)
+        repeat(64) {
+            val x = (it % 8 + 0.5f) * w / 8f
+            val y = (it / 8 + 0.5f) * h / 8f
+            val color = colors[random.nextInt(colors.size)]
+            drawBulb(canvas, x, y, color, 4.5f + random.nextFloat() * 2f)
+        }
+    }
+
+    private fun drawWave(canvas: Canvas, w: Float, h: Float) {
+        val count = 36
+        for (i in 0 until count) {
+            val x = (i + 0.5f) * w / count
+            val y = h * (0.5f + 0.32f * kotlin.math.sin((i * 0.35f + frame * 0.12f).toDouble()).toFloat())
+            drawBulb(canvas, x, y, colors[(i + frame / 3) % colors.size], 5.5f)
+        }
+    }
+
+    private fun drawSoftGlow(canvas: Canvas, w: Float, h: Float) {
+        val count = 48
+        for (i in 0 until count) {
+            val x = (i % 8 + 0.5f) * w / 8f
+            val y = (i / 8 + 0.5f) * h / 6f
+            val color = colors[(i + frame / 5) % colors.size]
+            drawBulb(canvas, x, y, color, 5f)
         }
     }
 
